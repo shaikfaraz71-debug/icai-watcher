@@ -92,8 +92,8 @@ def open_batches(rows: list[list[str]]) -> list[list[str]]:
 
 
 def main() -> None:
-    # Manual "Run workflow" clicks always send a test ping to the phone.
-    if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+    # A test ping is sent only when you tick the "test" box on a manual run.
+    if os.environ.get("TEST_PING") == "true":
         notify(f"Test alert from GitHub (manual run). Topic length: {len(NTFY_TOPIC)}")
 
     with sync_playwright() as p:
