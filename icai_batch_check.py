@@ -46,11 +46,25 @@ def read_rows(page) -> list[list[str]]:
     pick(page, 1, POU)
     pick(page, 2, COURSE)
 
-    btn = page.get_by_role("button", name=re.compile(r"search|submit|show|view", re.I))
+    btn = page.get_by_role("button", name=re.compile(r"search|submit|show|view|get|go", re.I))
+    if not btn.count():
+        btn = page.locator("input[type=submit], input[type=button], button")
     if btn.count():
         btn.first.click()
         page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(1000)
+    page.wait_for_timeout(3000)
+
+    # ---- DEBUG OUTPUT (shows in the Actions log) ----
+    print("URL:", page.url)
+    for i in range(page.locator("select").count()):
+        chosen = page.locator("select").nth(i).evaluate(
+            "e => e.options[e.selectedIndex] ? e.options[e.selectedIndex].text : ''"
+        )
+        print(f"select {i} = {chosen}")
+    print("BUTTONS:", page.locator("input[type=submit], input[type=button], button").evaluate_all(
+        "els => els.map(e => e.value || e.innerText || e.id)"))
+    print("PAGE TEXT:", page.inner_text("body")[:3000])
+    print("---- END DEBUG ----")
 
     rows = []
     for tr in page.locator("table tr").all():
