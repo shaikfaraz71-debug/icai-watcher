@@ -1,7 +1,7 @@
 name: ICAI batch check
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "2-59/5 * * * *"
   workflow_dispatch:
 concurrency:
   group: icai-check
