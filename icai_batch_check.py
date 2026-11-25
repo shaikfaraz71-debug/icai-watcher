@@ -92,6 +92,10 @@ def open_batches(rows: list[list[str]]) -> list[list[str]]:
 
 
 def main() -> None:
+    # Manual "Run workflow" clicks always send a test ping to the phone.
+    if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+        notify(f"Test alert from GitHub (manual run). Topic length: {len(NTFY_TOPIC)}")
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
