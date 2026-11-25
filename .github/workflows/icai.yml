@@ -1,0 +1,31 @@
+name: ICAI batch check
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+concurrency:
+  group: icai-check
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install playwright requests
+          playwright install --with-deps chromium
+      - name: Restore last-seen state
+        uses: actions/cache@v4
+        with:
+          path: state.txt
+          key: state-${{ github.run_id }}
+          restore-keys: state-
+      - name: Check batches
+        run: python icai_batch_check.py
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
